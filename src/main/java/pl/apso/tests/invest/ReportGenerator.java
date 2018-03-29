@@ -1,22 +1,24 @@
 package pl.apso.tests.invest;
 
+import pl.apso.tests.invest.math.Amount;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class ReportGenerator {
 
-  public Report generate(SuggestedInvestment investment) {
+  public Report generate(Investments investment) {
     List<ReportLine> lines = investment.getInvestments().stream()
       .map(x -> new ReportLine(
         x.getFund().getType(),
         x.getFund().getName(),
-        x.getPercentage().eval(investment.getAmount()),
-        x.getPercentage().getValue()))
+        investment.getAmount().percentage(x.getPercentage()),
+        x.getPercentage()))
       .collect(Collectors.toList());
 
-    long sum = lines.stream().map(x -> x.getAmount()).reduce(0L, (x, y) -> x + y);
+    Amount sum = lines.stream().map(ReportLine::getAmount).reduce(Amount.zero, Amount::add);
 
-    return new Report(investment.getAmount().minus(sum), lines);
+    return new Report(investment.getAmount(), investment.getAmount().minus(sum), lines);
 
   }
 

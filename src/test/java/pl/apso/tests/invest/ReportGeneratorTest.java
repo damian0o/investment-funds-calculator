@@ -1,6 +1,7 @@
 package pl.apso.tests.invest;
 
 import org.junit.Test;
+import pl.apso.tests.invest.math.Amount;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,10 +20,10 @@ public class ReportGeneratorTest {
   public void shouldGenerateReportForEmptySuggestion() {
     // when
     ReportGenerator generator = new ReportGenerator();
-    SuggestedInvestment suggestion = new SuggestedInvestment(new Amount(10000L), BALANCED, Collections.emptyList());
+    Investments suggestion = new Investments(new Amount(10000L), BALANCED, Collections.emptyList());
     Report report = generator.generate(suggestion);
     // then
-    assertThat(report).isEqualTo(new Report(new Amount(10000L), Collections.emptyList()));
+    assertThat(report).isEqualTo(new Report(new Amount(10000L), new Amount(10000L), Collections.emptyList()));
 
   }
 
@@ -36,18 +37,20 @@ public class ReportGeneratorTest {
     Fund fundFor3 = new Fund("3", FOREIGN);
     Fund fundMon1 = new Fund("1", MONEY);
 
-    List<Investment> investments = Arrays.asList(new Investment(10, fundPol1),
-      new Investment(10, fundPol2),
-      new Investment(25, fundFor1),
-      new Investment(25, fundFor2),
-      new Investment(25, fundFor3),
-      new Investment(5, fundMon1));
+    List<Investment> investments = Arrays.asList(
+      new Investment(1000, fundPol1),
+      new Investment(1000, fundPol2),
+      new Investment(2500, fundFor1),
+      new Investment(2500, fundFor2),
+      new Investment(2500, fundFor3),
+      new Investment(500, fundMon1));
+
+    Investments suggestion = new Investments(new Amount(10001L), SAFE, investments);
     // when
     ReportGenerator generator = new ReportGenerator();
-    SuggestedInvestment suggestion = new SuggestedInvestment(new Amount(10001L), SAFE, investments);
     Report report = generator.generate(suggestion);
     // then
-    assertThat(report.getRest()).isEqualTo(new Amount(1L));
+    assertThat(report.getUnspent()).isEqualTo(new Amount(1L));
   }
 
 }
